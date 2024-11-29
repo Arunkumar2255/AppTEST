@@ -32,11 +32,6 @@ jobs:
          rm gke-gcloud-auth-plugin.tar.gz
 
 
-
-
-
-
-
       # Set up GKE kubectl credentials
       - name: 'Configure GKE credentials'
         run: |
