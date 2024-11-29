@@ -25,9 +25,12 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      - name: Install gke-gcloud-auth-plugin via gcloud
+      - name: Install gke-gcloud-auth-plugin
         run: |
-         sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin
+         curl -sSL https://github.com/google-gke/gke-gcloud-auth-plugin/releases/latest/download/gke-gcloud-auth-plugin-linux-amd64.tar.gz -o gke-gcloud-auth-plugin.tar.gz
+         tar -xzvf gke-gcloud-auth-plugin.tar.gz -C /usr/local/bin
+         rm gke-gcloud-auth-plugin.tar.gz
+
 
 
 
