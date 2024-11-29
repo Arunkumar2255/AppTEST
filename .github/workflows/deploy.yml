@@ -1,37 +1,64 @@
 name: GCP Login, Image Building, Push To GCR, Deploy In GKE
+ 
 on:
+
   push:
+
     branches:
-      - main # Trigger the workflow on pushes to the main branch
-  pull_request: # Optional: Trigger on pull requests
+
+      - main  # Trigger the workflow on pushes to the main branch
+
+  pull_request:  # Optional: Trigger on pull requests
+
     branches:
+
       - main
+ 
 jobs:
+
   build-and-push:
+
     name: Build and Push Docker Image to GCR
+
     runs-on: ubuntu-latest
+
     steps:
+
     - name: Checkout Repository
+
       uses: actions/checkout@v3
  
     - name: Set up Google Cloud SDK
+
       uses: google-github-actions/setup-gcloud@v1
+
       with:
+
         service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
  
     - name: Authenticate Docker to GCR
+
       run: gcloud auth configure-docker
  
     - name: Build Docker Image
+
       id: build
+
       run: |
+
         IMAGE_NAME=gcr.io/${{ secrets.GOOGLE_CREDENTIALS }}/my-app
+
         docker build -t $IMAGE_NAME .
+
         echo "image=$IMAGE_NAME" >> $GITHUB_ENV
  
     - name: Push Docker Image to GCR
+
       run: |
+
         docker push ${{ env.image }}
+
+ 
  
       
 
