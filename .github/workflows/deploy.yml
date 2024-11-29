@@ -27,9 +27,9 @@ jobs:
 
       - name: Install gke-gcloud-auth-plugin
         run: |
-          curl -sSL https://github.com/google-gke/gke-gcloud-auth-plugin/releases/download/v0.1.0/gke-gcloud-auth-plugin-linux-amd64.tar.gz -o gke-gcloud-auth-plugin.tar.gz
-          tar -xzvf gke-gcloud-auth-plugin.tar.gz -C /usr/local/bin
-          rm gke-gcloud-auth-plugin.tar.gz
+          sudo apt-get update
+          sudo apt-get install gke-gcloud-auth-plugin
+
 
       # Set up GKE kubectl credentials
       - name: 'Configure GKE credentials'
