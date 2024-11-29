@@ -27,7 +27,7 @@ jobs:
 
       - name: Install gke-gcloud-auth-plugin via gcloud
         run: |
-         gcloud components install gke-gcloud-auth-plugin
+         sudo gcloud components install gke-gcloud-auth-plugin
 
 
 
