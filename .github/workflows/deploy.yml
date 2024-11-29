@@ -25,10 +25,11 @@ jobs:
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
-      # Install the gke-gcloud-auth-plugin
       - name: Install gke-gcloud-auth-plugin
         run: |
-          curl -sSL https://github.com/googlecloudplatform/k8s-config-connector/releases/download/v0.5.0/gke-gcloud-auth-plugin-linux-amd64.tar.gz | tar xz -C /usr/local/bin
+          curl -sSL https://github.com/google-gke/gke-gcloud-auth-plugin/releases/download/v0.1.0/gke-gcloud-auth-plugin-linux-amd64.tar.gz -o gke-gcloud-auth-plugin.tar.gz
+          tar -xzvf gke-gcloud-auth-plugin.tar.gz -C /usr/local/bin
+          rm gke-gcloud-auth-plugin.tar.gz
 
       # Set up GKE kubectl credentials
       - name: 'Configure GKE credentials'
