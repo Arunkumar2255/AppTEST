@@ -14,30 +14,31 @@ jobs:
       - name: Check out Application Repository
         uses: actions/checkout@v3
 
-      # Cache Helm dependencies to speed up the builds
-      - name: Cache Helm dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.helm
-          key: ${{ runner.os }}-helm-${{ hashFiles('**/Chart.yaml') }}
-          
       # Install Helm
       - name: Install Helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+      # Authenticate to Google Cloud
       - name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@v2'
         with:
           credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
+      # Install the gke-gcloud-auth-plugin
+      - name: Install gke-gcloud-auth-plugin
+        run: |
+          curl -sSL https://github.com/googlecloudplatform/k8s-config-connector/releases/download/v0.5.0/gke-gcloud-auth-plugin-linux-amd64.tar.gz | tar xz -C /usr/local/bin
 
       # Set up GKE kubectl credentials
       - name: 'Configure GKE credentials'
         run: |
           gcloud container clusters get-credentials my-private-cluster --zone asia-east1-c --project gcp-poc-442512
 
-      # Verify kubectl is working
+      # Verify kubectl setup
       - name: 'Verify kubectl setup'
         run: kubectl get nodes
+
+      
+
 
