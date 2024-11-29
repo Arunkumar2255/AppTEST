@@ -46,7 +46,7 @@ jobs:
 
       run: |
 
-        IMAGE_NAME=gcr.io/${{ secrets.GOOGLE_CREDENTIALS }}/my-app
+        IMAGE_NAME=gcr.io/${{ secrets.GCP_PROJECT_ID }}/my-app
 
         docker build -t $IMAGE_NAME .
 
