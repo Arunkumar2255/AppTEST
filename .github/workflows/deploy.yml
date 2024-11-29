@@ -22,6 +22,20 @@ jobs:
       with:
         service_account_key: ${{ secrets.GOOGLE_CREDENTIALS }}
 
+        
+    - name: Authenticate Docker to GCR
+      run: gcloud auth configure-docker
+ 
+    - name: Build Docker Image
+      run: |
+        IMAGE_NAME=gcr.io/${{ secrets.GOOGLE_CREDENTIALS }}/my-app
+        docker build -t $IMAGE_NAME .
+        echo "::set-output name=image::$IMAGE_NAME"
+ 
+    - name: Push Docker Image to GCR
+      run: |
+        IMAGE_NAME=$(echo ${{ steps.build.outputs.image }})
+        docker push $IMAGE_NAME
       
 
 
