@@ -1,61 +1,27 @@
-name: Deploy Application to GKE using Helm
-
+name: Build and Push to GCR
+ 
 on:
   push:
     branches:
+      - main # Trigger the workflow on pushes to the main branch
+  pull_request: # Optional: Trigger on pull requests
+    branches:
       - main
-
+ 
 jobs:
-  deploy-gke:
+  build-and-push:
+    name: Build and Push Docker Image to GCR
     runs-on: ubuntu-latest
-
+ 
     steps:
-      # Checkout the repository containing the application code
-      - name: Check out Application Repository
-        uses: actions/checkout@v3
-
-      # Install Helm
-      - name: Install Helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-      # Authenticate to Google Cloud
-      - name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
-        with:
-          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
-   
-      - name: Add Google Cloud SDK repository
-        run: |
-          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-          curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg
-          sudo apt-get update
-
-      - name: Install google-cloud-sdk
-        run: |
-         sudo apt-get install google-cloud-sdk
-
-      - name: Download and install gke-gcloud-auth-plugin
-        run: |
-         curl -sSL https://github.com/googlecloudplatform/gke-gcloud-auth-plugin/releases/download/v0.1.0/gke-gcloud-auth-plugin-linux-amd64.tar.gz -o gke-gcloud-auth-plugin.tar.gz
-         tar -xzvf gke-gcloud-auth-plugin.tar.gz -C /usr/local/bin
-         rm gke-gcloud-auth-plugin.tar.gz
-
-      - name: Verify plugin installation
-        run: |
-         gke-gcloud-auth-plugin --version
-
-
-
-      # Set up GKE kubectl credentials
-      - name: 'Configure GKE credentials'
-        run: |
-          gcloud container clusters get-credentials my-private-cluster --zone asia-east1-c --project gcp-poc-442512
-
-      # Verify kubectl setup
-      - name: 'Verify kubectl setup'
-        run: kubectl get nodes
-
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+ 
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v1
+      with:
+        service_account_key: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
       
 
 
