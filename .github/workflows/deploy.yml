@@ -1,4 +1,4 @@
-name: Build and Push to GCR
+name: GCP Login,Image Building,Push To GCR,Deploy In GKE
  
 on:
   push:
