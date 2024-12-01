@@ -32,7 +32,7 @@ jobs:
     - name: Build Docker Image
       id: build
       run: |
-        IMAGE_NAME=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-artifact-repo/my-app
+        IMAGE_NAME=asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-app
         docker build -t $IMAGE_NAME ./AppRes
         echo "image=$IMAGE_NAME" >> $GITHUB_ENV
 
