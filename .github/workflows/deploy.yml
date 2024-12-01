@@ -40,11 +40,11 @@ jobs:
       run: |
         sudo mkdir -p $HOME/.kube
         echo "${{ secrets.KUBE }}" | sudo tee $HOME/.kube/config > /dev/null
-        sudo chmod 600 $HOME/.kube/config
+        sudo chmod 644 $HOME/.kube/config
       env:
         KUBECONFIG: $HOME/.kube/config
 
-    # Step 6: Test kubectl access
+    # Step 6: Test kubectl Access
     - name: Test kubectl access
       run: |
         kubectl get pods --all-namespaces
