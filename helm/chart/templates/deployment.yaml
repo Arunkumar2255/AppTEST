@@ -25,10 +25,5 @@ spec:
           env:
             - name: PORT
               value: "{{ .Values.env.PORT }}"
-            - name: MONGODB_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Release.Name }}-config
-                  key: MONGODB_URI
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
