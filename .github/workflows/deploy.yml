@@ -1,4 +1,4 @@
-name: GCP Login, Image Building, Push To GCR, Deploy In GKE
+name: Build, Push, and Deploy to GKE
 
 on:
   push:
@@ -9,53 +9,60 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
-    name: Build, Push, and Deploy to GKE
-    runs-on: ubuntu-latest
-
+  # Step 1: Build the Docker Image
+  build:
+    name: Build Docker Image
+    runs-on: self-hosted
     steps:
-    # Step 1: Checkout Repository
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    # Step 2: Configure kubectl and Helm
-    - name: Configure kubectl and Helm
-      run: |
-        # Create the .kube directory if it does not exist
-        mkdir -p $HOME/.kube
-
-        # Decode the base64-encoded KUBE secret and save it to the kube config location
-        echo "${{ secrets.KUBE }}" > $HOME/.kube/config
-        chmod 600 $HOME/.kube/config
-      env:
-        KUBECONFIG: $HOME/.kube/config
-
-    # Step 3: Test kubectl access
-    - name: Test kubectl access
-      run: |
-        kubectl get pods --all-namespaces
-
-    # Step 4: Authenticate Docker to Artifact Registry
     - name: Authenticate Docker to Artifact Registry
       run: gcloud auth configure-docker asia-east1-docker.pkg.dev
 
-    # Step 5: Build Docker Image
     - name: Build Docker Image
       id: build
       run: |
         IMAGE_NAME=asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-app
         docker build -t $IMAGE_NAME ./AppRes
         echo "image=$IMAGE_NAME" >> $GITHUB_ENV
+    outputs:
+      image: ${{ steps.build.outputs.image }}
 
-    # Step 6: Push Docker Image to Artifact Registry
+  # Step 2: Push the Docker Image
+  push:
+    name: Push Docker Image
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+    - name: Authenticate Docker to Artifact Registry
+      run: gcloud auth configure-docker asia-east1-docker.pkg.dev
+
     - name: Push Docker Image to Artifact Registry
       run: |
-        docker push ${{ env.image }}
+        docker push ${{ needs.build.outputs.image }}
 
-    # Step 7: Deploy Using Helm
-    - name: Deploy to GKE
+  # Step 3: Deploy to GKE
+  deploy:
+    name: Deploy to GKE
+    runs-on: ubuntu-latest
+    needs: push
+    steps:
+    - name: Configure kubectl and Helm
+      run: |
+        mkdir -p $HOME/.kube
+        echo "${{ secrets.KUBE }}" > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
+      env:
+        KUBECONFIG: $HOME/.kube/config
+
+    - name: Test kubectl access
+      run: |
+        kubectl get pods --all-namespaces
+
+    - name: Deploy Using Helm
       run: |
         helm upgrade --install my-app ./helm/chart \
           --namespace default \
-          --set image.repository=${{ env.image }} \
+          --set image.repository=${{ needs.build.outputs.image }} \
           --set image.tag=latest
