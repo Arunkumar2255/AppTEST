@@ -23,12 +23,12 @@ jobs:
         credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
 
     - name: Authenticate Docker to Artifact Registry
-      run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
 
     - name: Build Docker Image
       id: build
       run: |
-        IMAGE_NAME=${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-artifact-repo/my-app
+        IMAGE_NAME=us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-artifact-repo/my-app
         docker build -t $IMAGE_NAME ./AppRes
         echo "image=$IMAGE_NAME" >> $GITHUB_ENV
 
