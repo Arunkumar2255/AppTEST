@@ -35,7 +35,13 @@ jobs:
         IMAGE_NAME=${{ steps.build.outputs.image }}
         sudo docker push $IMAGE_NAME
 
-    # Step 5: Configure kubectl and Helm
+    # Step 5: Install Helm
+    - name: Install Helm
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+        helm version
+
+    # Step 6: Configure kubectl and Helm
     - name: Configure kubectl and Helm
       run: |
         sudo mkdir -p $HOME/.kube
@@ -43,11 +49,6 @@ jobs:
         sudo chmod 644 $HOME/.kube/config
       env:
         KUBECONFIG: $HOME/.kube/config
-
-    # Step 6: Check Helm Installation
-    - name: Check Helm Installation
-      run: |
-        helm version
 
     # Step 7: Test kubectl Access
     - name: Test kubectl access
