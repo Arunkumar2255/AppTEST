@@ -33,18 +33,18 @@ jobs:
       id: build
       run: |
         IMAGE_NAME=asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-app
-        docker build -t $IMAGE_NAME ./AppRes
-        echo "image=$IMAGE_NAME" >> $GITHUB_ENV
+        sudo docker build -t $IMAGE_NAME ./AppRes
+        sudo echo "image=$IMAGE_NAME" >> $GITHUB_ENV
 
     # Step 5: Push Docker Image to Artifact Registry
     - name: Push Docker Image to Artifact Registry
       run: |
-        docker push ${{ env.image }}
+        sudo docker push ${{ env.image }}
 
     # Step 6: Verify Cluster Details
     - name: Verify GKE Cluster
       run: |
-        gcloud container clusters describe my-private-cluster \
+        sudo gcloud container clusters describe my-private-cluster \
           --zone asia-east1-c \
           --project ${{ secrets.GCP_PROJECT_ID }}
 
@@ -60,7 +60,7 @@ jobs:
     # Step 8: Deploy Using Helm
     - name: Deploy to GKE
       run: |
-        helm upgrade --install my-app ./helm/chart \
+        sudo helm upgrade --install my-app ./helm/chart \
           --namespace default \
           --set image.repository=${{ env.image }} \
           --set image.tag=latest
