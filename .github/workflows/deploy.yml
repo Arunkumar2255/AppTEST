@@ -25,14 +25,15 @@ jobs:
     - name: Build Docker Image
       id: build
       run: |
-        sudo IMAGE_NAME=asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-app
+        IMAGE_NAME=asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-app
         sudo docker build -t $IMAGE_NAME ./AppRes
         echo "::set-output name=image::$IMAGE_NAME"
 
     # Step 4: Push Docker Image to Artifact Registry
     - name: Push Docker Image to Artifact Registry
       run: |
-        sudo docker push ${{ steps.build.outputs.image }}
+        IMAGE_NAME=${{ steps.build.outputs.image }}
+        sudo docker push $IMAGE_NAME
 
     # Step 5: Configure kubectl and Helm
     - name: Configure kubectl and Helm
@@ -51,7 +52,8 @@ jobs:
     # Step 7: Deploy Using Helm
     - name: Deploy to GKE
       run: |
+        IMAGE_NAME=${{ steps.build.outputs.image }}
         helm upgrade --install my-app ./helm/chart \
           --namespace default \
-          --set image.repository=$(echo "${{ steps.build.outputs.image }}" | cut -d':' -f1) \
-          --set image.tag=latest
+          --set image.repository=$(echo $IMAGE_NAME | cut -d':' -f1) \
+          --set image.tag=$(echo $IMAGE_NAME | cut -d':' -f2)
