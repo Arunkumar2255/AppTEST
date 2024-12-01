@@ -55,7 +55,7 @@ jobs:
         cluster_name: my-private-cluster
         location: asia-east1-c
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        use_internal_ip: false  # Change to true if the cluster is private
+        use_internal_ip: true # Change to true if the cluster is private
 
     # Step 8: Deploy Using Helm
     - name: Deploy to GKE
