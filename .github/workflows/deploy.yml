@@ -35,3 +35,21 @@ jobs:
     - name: Push Docker Image to Artifact Registry
       run: |
         docker push ${{ env.image }}
+
+
+
+# Step 6: Configure Kubernetes Access
+    - name: Set up GKE Kubectl
+      uses: google-github-actions/get-gke-credentials@v1
+      with:
+        cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+        location: us-central1
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    # Step 7: Deploy Using Helm
+    - name: Deploy to GKE
+      run: |
+        helm upgrade --install my-app ./helm/chart \
+          --namespace default \
+          --set image.repository=${{ env.image }} \
+          --set image.tag=latest
