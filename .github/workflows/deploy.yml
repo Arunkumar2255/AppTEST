@@ -11,56 +11,49 @@ on:
 jobs:
   build-and-deploy:
     name: Build, Push, and Deploy to GKE
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
     # Step 1: Checkout Repository
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    # Step 2: Authenticate to Google Cloud
-    - name: Authenticate to Google Cloud
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+    # Step 2: Configure kubectl and Helm
+    - name: Configure kubectl and Helm
+      run: |
+        # Decode the base64-encoded KUBE secret and save it to the kube config location
+        echo "${{ secrets.KUBE }}" > $HOME/.kube/config
+        chmod 600 $HOME/.kube/config
+      env:
+        KUBECONFIG: $HOME/.kube/config  # Ensure kubectl and helm use this path
 
-    # Step 3: Authenticate Docker to Artifact Registry
+    # Step 3: Test kubectl access
+    - name: Test kubectl access
+      run: |
+        export KUBECONFIG=$HOME/.kube/config
+        kubectl get pods --all-namespaces
+
+    # Step 4: Authenticate Docker to Artifact Registry
     - name: Authenticate Docker to Artifact Registry
       run: gcloud auth configure-docker asia-east1-docker.pkg.dev
 
-    # Step 4: Build Docker Image
+    # Step 5: Build Docker Image
     - name: Build Docker Image
       id: build
       run: |
         IMAGE_NAME=asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/my-repo/my-app
-        sudo docker build -t $IMAGE_NAME ./AppRes
-        sudo echo "image=$IMAGE_NAME" >> $GITHUB_ENV
+        docker build -t $IMAGE_NAME ./AppRes
+        echo "image=$IMAGE_NAME" >> $GITHUB_ENV
 
-    # Step 5: Push Docker Image to Artifact Registry
+    # Step 6: Push Docker Image to Artifact Registry
     - name: Push Docker Image to Artifact Registry
       run: |
-        sudo docker push ${{ env.image }}
+        docker push ${{ env.image }}
 
-    # Step 6: Verify Cluster Details
-    - name: Verify GKE Cluster
-      run: |
-        sudo gcloud container clusters describe my-private-cluster \
-          --zone asia-east1-c \
-          --project ${{ secrets.GCP_PROJECT_ID }}
-
-    # Step 7: Set up GKE Kubectl
-    - name: Set up GKE Kubectl
-      uses: google-github-actions/get-gke-credentials@v1
-      with:
-        cluster_name: my-private-cluster
-        location: asia-east1-c
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        use_internal_ip: true
-
-    # Step 8: Deploy Using Helm
+    # Step 7: Deploy Using Helm
     - name: Deploy to GKE
       run: |
-        sudo helm upgrade --install my-app ./helm/chart \
+        helm upgrade --install my-app ./helm/chart \
           --namespace default \
           --set image.repository=${{ env.image }} \
           --set image.tag=latest
