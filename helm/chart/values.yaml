@@ -1,9 +1,9 @@
 replicaCount: 1  # Adjust to 2+ if needed and resources permit
 
 image:
-  repository: arunkumar2255/nodejs-latest
+  repository: asia-east1-docker.pkg.dev/gcp-poc-442512/my-repo/my-app
   pullPolicy: Always
-  tag: "v.89"
+  tag: latst
 
 service:
   type: NodePort
