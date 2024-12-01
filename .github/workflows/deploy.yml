@@ -21,16 +21,18 @@ jobs:
     # Step 2: Configure kubectl and Helm
     - name: Configure kubectl and Helm
       run: |
+        # Create the .kube directory if it does not exist
+        mkdir -p $HOME/.kube
+
         # Decode the base64-encoded KUBE secret and save it to the kube config location
         echo "${{ secrets.KUBE }}" > $HOME/.kube/config
         chmod 600 $HOME/.kube/config
       env:
-        KUBECONFIG: $HOME/.kube/config  # Ensure kubectl and helm use this path
+        KUBECONFIG: $HOME/.kube/config
 
     # Step 3: Test kubectl access
     - name: Test kubectl access
       run: |
-        export KUBECONFIG=$HOME/.kube/config
         kubectl get pods --all-namespaces
 
     # Step 4: Authenticate Docker to Artifact Registry
