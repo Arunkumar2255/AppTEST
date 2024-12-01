@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-push:
-    name: Build and Push Docker Image to Artifact Registry
+    name: Build, Push, and Deploy to GKE
     runs-on: ubuntu-latest
 
     steps:
@@ -36,17 +36,13 @@ jobs:
       run: |
         docker push ${{ env.image }}
 
-
-
-# Step 6: Configure Kubernetes Access
     - name: Set up GKE Kubectl
       uses: google-github-actions/get-gke-credentials@v1
       with:
-        cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+        cluster_name: my-private-cluster
         location: us-central1
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-    # Step 7: Deploy Using Helm
     - name: Deploy to GKE
       run: |
         helm upgrade --install my-app ./helm/chart \
