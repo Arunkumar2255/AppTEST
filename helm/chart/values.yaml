@@ -3,7 +3,8 @@ replicaCount: 1  # Adjust to 2+ if needed and resources permit
 image:
   repository: asia-east1-docker.pkg.dev/gcp-poc-442512/my-repo/my-app
   pullPolicy: Always
-  tag: latest  # Corrected typo here
+  tag: latest
+
 
 service:
   type: NodePort
