@@ -44,12 +44,17 @@ jobs:
       env:
         KUBECONFIG: $HOME/.kube/config
 
-    # Step 6: Test kubectl Access
+    # Step 6: Check Helm Installation
+    - name: Check Helm Installation
+      run: |
+        helm version
+
+    # Step 7: Test kubectl Access
     - name: Test kubectl access
       run: |
         kubectl get pods --all-namespaces
 
-    # Step 7: Deploy Using Helm
+    # Step 8: Deploy Using Helm
     - name: Deploy to GKE
       run: |
         IMAGE_NAME=${{ steps.build.outputs.image }}
