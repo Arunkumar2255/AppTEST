@@ -26,7 +26,7 @@ jobs:
 
     # Step 3: Authenticate Docker to Artifact Registry
     - name: Authenticate Docker to Artifact Registry
-      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+      run: gcloud auth configure-docker asia-east1-docker.pkg.dev
 
     # Step 4: Build Docker Image
     - name: Build Docker Image
@@ -55,7 +55,7 @@ jobs:
         cluster_name: my-private-cluster
         location: asia-east1-c
         project_id: ${{ secrets.GCP_PROJECT_ID }}
-        use_internal_ip: true # Change to true if the cluster is private
+        use_internal_ip: true
 
     # Step 8: Deploy Using Helm
     - name: Deploy to GKE
