@@ -16,8 +16,8 @@ env:
 
 resources:
   requests:
-    memory: "32Mi"  # Reduced memory requests
+    memory: "256Mi"  # Reduced memory requests
     cpu: "100m"     # Reduced CPU requests
   limits:
-    memory: "64Mi"  # Reduced memory limits
+    memory: "512Mi"  # Reduced memory limits
     cpu: "250m"     # Reduced CPU limits
